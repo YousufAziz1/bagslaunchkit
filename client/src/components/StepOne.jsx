@@ -158,7 +158,7 @@ export default function StepOne({ formData, setFormData, onSubmit, loading }) {
         </button>
 
         <p className="text-center text-text-muted text-xs">
-          Powered by Claude AI · Results in ~10 seconds
+          Powered by Gemini AI · Results in ~10 seconds
         </p>
       </form>
     </div>
