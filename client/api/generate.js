@@ -43,8 +43,8 @@ export default async function handler(req, res) {
   try {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
     
-    // Use the model explicitly requested and enabled on user's Paid tier
-    const model = genAI.getGenerativeModel({
+    // First Priority: Try Gemini 2.5 Flash as requested
+    let model = genAI.getGenerativeModel({
       model: 'gemini-2.5-flash',
       systemInstruction: SYSTEM_INSTRUCTION,
       generationConfig: {
@@ -52,8 +52,25 @@ export default async function handler(req, res) {
         responseMimeType: 'application/json',
       },
     })
+    
+    let result;
+    try {
+      result = await model.generateContent(buildPrompt({ creatorName, projectType, projectIdea, targetAudience, language }))
+    } catch (err) {
+      console.warn('Gemini 2.5 Flash failed (overloaded/quota), falling back to highly-stable gemini-1.5-flash:', err.message)
+      
+      // Fallback: If 2.5 throws 503 Overloaded or 429 Quota, aggressively fallback to 1.5 Flash
+      model = genAI.getGenerativeModel({
+        model: 'gemini-1.5-flash',
+        systemInstruction: SYSTEM_INSTRUCTION,
+        generationConfig: {
+          temperature: 0.9,
+          responseMimeType: 'application/json',
+        },
+      })
+      result = await model.generateContent(buildPrompt({ creatorName, projectType, projectIdea, targetAudience, language }))
+    }
 
-    const result = await model.generateContent(buildPrompt({ creatorName, projectType, projectIdea, targetAudience, language }))
     const rawText = result.response.text().trim()
     const cleaned = rawText
       .replace(/^```json\s*/i, '')
@@ -63,7 +80,7 @@ export default async function handler(req, res) {
       
     res.status(200).json(JSON.parse(cleaned))
   } catch (err) {
-    console.error('Gemini API error:', err)
+    console.error('Gemini API error (both models failed):', err)
     res.status(500).json({ error: `AI generation failed: ${err.message}` })
   }
 }
