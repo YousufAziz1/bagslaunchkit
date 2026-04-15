@@ -43,9 +43,9 @@ export default async function handler(req, res) {
   try {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
     
-    // Model name set to standard fast model (1.5 has better free-tier global availability)
+    // Use the model explicitly requested and enabled on user's Paid tier
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       systemInstruction: SYSTEM_INSTRUCTION,
       generationConfig: {
         temperature: 0.9,
