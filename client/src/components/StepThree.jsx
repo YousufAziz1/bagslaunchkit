@@ -2,8 +2,9 @@ import { useState, useRef } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import confetti from 'canvas-confetti'
+import { BagsClient } from '@bagsfm/bags-sdk'
 import {
-  Rocket, Upload, Wallet, ExternalLink, Twitter,
+  Rocket, Wallet, ExternalLink, Twitter,
   CheckCircle, ArrowLeft, X, ImageIcon
 } from 'lucide-react'
 
@@ -122,26 +123,15 @@ export default function StepThree({ data, onBack, onReset }) {
     setLaunching(true)
 
     try {
-      // Attempt Bags SDK launch
-      let hash = ''
-      try {
-        const { BagsClient } = await import('@bagsfm/bags-sdk')
-        const client = new BagsClient({ network: 'mainnet-beta' })
-        const result = await client.createToken({
-          name: form.tokenName,
-          symbol: form.tokenSymbol,
-          description: form.description,
-          image: imageFile || undefined,
-          wallet: publicKey?.toBase58(),
-        })
-        hash = result?.signature || result?.txHash || ''
-      } catch (sdkErr) {
-        // SDK not available or call failed — simulate for demo
-        console.warn('Bags SDK error (demo mode):', sdkErr.message)
-        await new Promise((r) => setTimeout(r, 2000))
-        hash = 'DEMO_TX_' + Math.random().toString(36).slice(2, 18).toUpperCase()
-      }
-
+      const client = new BagsClient({ network: 'mainnet-beta' })
+      const result = await client.createToken({
+        name: form.tokenName,
+        symbol: form.tokenSymbol,
+        description: form.description,
+        image: imageFile || undefined,
+        wallet: publicKey?.toBase58(),
+      })
+      const hash = result?.signature || result?.txHash || ''
       setTxHash(hash)
       setLaunched(true)
       fireConfetti()
