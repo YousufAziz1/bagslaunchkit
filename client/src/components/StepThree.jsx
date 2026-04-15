@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 import confetti from 'canvas-confetti'
-import { BagsClient } from '@bagsfm/bags-sdk'
+import { BagsClient } from '../lib/bags-sdk-mock.js'
 import {
   Rocket, Wallet, ExternalLink, Twitter,
   CheckCircle, ArrowLeft, X, ImageIcon
