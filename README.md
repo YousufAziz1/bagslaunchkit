@@ -1,5 +1,6 @@
 <div align="center">
-
+  <img src="./logo.png" alt="Logo" width="100"/>
+  
 # 💼 BagsLaunchKit
 
 ### AI-Powered Creator Token Launch on Bags.fm in Under 60 Seconds 🚀

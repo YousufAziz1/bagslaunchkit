@@ -110,9 +110,12 @@ function Footer() {
   return (
     <footer className="mt-24 border-t border-border py-10 text-center">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p className="font-grotesk font-bold text-text-primary text-lg">
-          Bags<span className="text-gradient-purple">LaunchKit</span>
-        </p>
+        <div className="flex items-center gap-2">
+          <img src="/logo.png" alt="Logo" className="w-6 h-6 object-contain rounded-md" />
+          <p className="font-grotesk font-bold text-text-primary text-lg">
+            Bags<span className="text-gradient-purple">LaunchKit</span>
+          </p>
+        </div>
         <div className="flex items-center gap-6 text-sm text-text-secondary">
           <a href="https://bags.fm" target="_blank" rel="noreferrer"
             className="flex items-center gap-1 hover:text-purple-400 transition-colors">
@@ -189,13 +192,16 @@ export default function Home({
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {/* ── Header ─────────────────────────────────────────────────────────── */}
         <header className="flex items-center justify-between mb-12">
-          <div>
-            <h1 className="font-grotesk text-2xl font-extrabold text-text-primary">
-              Bags<span className="text-gradient-purple">LaunchKit</span>
-            </h1>
-            <p className="text-text-secondary text-xs mt-0.5">
-              AI-Powered Creator Token Launch on Bags.fm
-            </p>
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="BagsLaunchKit" className="w-10 h-10 object-contain rounded-xl" />
+            <div>
+              <h1 className="font-grotesk text-2xl font-extrabold text-text-primary leading-none mb-0.5">
+                Bags<span className="text-gradient-purple">LaunchKit</span>
+              </h1>
+              <p className="text-text-secondary text-xs">
+                AI-Powered Creator Token Launch
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <a
