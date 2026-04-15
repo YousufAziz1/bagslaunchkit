@@ -199,6 +199,14 @@ export default function Home({
           </div>
           <div className="flex items-center gap-3">
             <a
+              href="https://github.com/YousufAziz1/bagslaunchkit"
+              target="_blank"
+              rel="noreferrer"
+              className="hidden sm:flex items-center justify-center w-10 h-10 rounded-xl bg-surface border border-border hover:border-accent/40 hover:bg-accent/10 transition-colors group"
+            >
+              <Github className="w-5 h-5 text-text-secondary group-hover:text-purple-400" />
+            </a>
+            <a
               href="#how-it-works"
               className="hidden sm:flex btn-ghost px-4 py-2 text-sm items-center gap-1.5"
             >
@@ -213,7 +221,7 @@ export default function Home({
           <div className="text-center mb-12 animate-in">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-6 text-sm text-purple-300 font-medium">
               <Sparkles className="w-4 h-4" />
-              Powered by Claude AI · Built for Bags.fm Hackathon
+              Powered by Gemini AI · Built for Bags.fm Hackathon
             </div>
             <h2 className="font-grotesk text-4xl sm:text-6xl font-extrabold text-text-primary leading-tight mb-4">
               Launch Your Creator <br />
