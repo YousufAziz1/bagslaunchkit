@@ -122,7 +122,7 @@ function Footer() {
             className="flex items-center gap-1 hover:text-purple-400 transition-colors">
             <BookOpen className="w-3.5 h-3.5" /> Docs
           </a>
-          <a href="https://github.com" target="_blank" rel="noreferrer"
+          <a href="https://github.com/YousufAziz1/bagslaunchkit" target="_blank" rel="noreferrer"
             className="flex items-center gap-1 hover:text-purple-400 transition-colors">
             <Github className="w-3.5 h-3.5" /> GitHub
           </a>
