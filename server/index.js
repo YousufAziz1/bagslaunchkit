@@ -1,7 +1,7 @@
 require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
-const Anthropic = require('@anthropic-ai/sdk')
+const { GoogleGenerativeAI } = require('@google/generative-ai')
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -9,11 +9,11 @@ const PORT = process.env.PORT || 3001
 app.use(cors())
 app.use(express.json())
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
 
-const SYSTEM_PROMPT = `You are an expert Web3 creator marketing consultant specializing in the Bags.fm platform on Solana. You help creators launch tokens and build communities. You write in a style that is energetic, credible, and community-focused. When language is "Hindi", mix Hindi and English naturally (Hinglish style). When language is "English", write in clean professional English with crypto-native tone.`
+const SYSTEM_INSTRUCTION = `You are an expert Web3 creator marketing consultant specializing in the Bags.fm platform on Solana. You help creators launch tokens and build communities. You write in a style that is energetic, credible, and community-focused. When language is "Hindi", mix Hindi and English naturally (Hinglish style). When language is "English", write in clean professional English with crypto-native tone.`
 
-function buildUserPrompt({ creatorName, projectType, projectIdea, targetAudience, language }) {
+function buildPrompt({ creatorName, projectType, projectIdea, targetAudience, language }) {
   return `A creator wants to launch their project on Bags.fm. Here are their details:
 - Creator Name: ${creatorName}
 - Project Type: ${projectType}
@@ -34,16 +34,24 @@ Generate the following in JSON format only (no markdown, no explanation):
 Return ONLY valid JSON. No explanation text before or after.`
 }
 
-async function callClaude(promptData) {
-  const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 2048,
-    system: SYSTEM_PROMPT,
-    messages: [{ role: 'user', content: buildUserPrompt(promptData) }],
+async function callGemini(promptData) {
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-2.5-flash-preview-04-17',
+    systemInstruction: SYSTEM_INSTRUCTION,
+    generationConfig: {
+      temperature: 0.9,
+      responseMimeType: 'application/json',
+    },
   })
-  const rawText = response.content[0].text.trim()
-  // Strip markdown code fences if present
-  const cleaned = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim()
+
+  const result = await model.generateContent(buildPrompt(promptData))
+  const rawText = result.response.text().trim()
+  // Strip markdown fences if present
+  const cleaned = rawText
+    .replace(/^```json\s*/i, '')
+    .replace(/^```\s*/i, '')
+    .replace(/```\s*$/i, '')
+    .trim()
   return JSON.parse(cleaned)
 }
 
@@ -56,22 +64,26 @@ app.post('/api/generate', async (req, res) => {
 
   let result
   try {
-    result = await callClaude({ creatorName, projectType, projectIdea, targetAudience, language })
+    result = await callGemini({ creatorName, projectType, projectIdea, targetAudience, language })
   } catch (err) {
+    console.error('Gemini API error (attempt 1):', err.message)
     // Retry once
     try {
-      result = await callClaude({ creatorName, projectType, projectIdea, targetAudience, language })
+      result = await callGemini({ creatorName, projectType, projectIdea, targetAudience, language })
     } catch (retryErr) {
-      console.error('Claude API failed after retry:', retryErr.message)
-      return res.status(500).json({ error: 'AI generation failed. Please try again.' })
+      console.error('Gemini API failed after retry:', retryErr.message)
+      return res.status(500).json({ error: 'AI generation failed. Please check your GEMINI_API_KEY and try again.' })
     }
   }
 
   res.json(result)
 })
 
-app.get('/api/health', (_req, res) => res.json({ status: 'ok', model: 'claude-sonnet-4-20250514' }))
+app.get('/api/health', (_req, res) =>
+  res.json({ status: 'ok', model: 'gemini-2.5-flash-preview-04-17' })
+)
 
 app.listen(PORT, () => {
   console.log(`🚀 BagsLaunchKit server running on http://localhost:${PORT}`)
+  console.log(`🤖 Using model: gemini-2.5-flash-preview-04-17`)
 })
