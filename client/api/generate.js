@@ -36,16 +36,23 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'creatorName and projectIdea are required' })
   }
 
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash-preview-04-17',
-    systemInstruction: SYSTEM_INSTRUCTION,
-    generationConfig: {
-      temperature: 0.9,
-      responseMimeType: 'application/json',
-    },
-  })
+  if (!process.env.GEMINI_API_KEY) {
+    return res.status(500).json({ error: 'GEMINI_API_KEY is not set in environment variables.' })
+  }
 
   try {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+    
+    // Model name set to standard fast model
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.0-flash',
+      systemInstruction: SYSTEM_INSTRUCTION,
+      generationConfig: {
+        temperature: 0.9,
+        responseMimeType: 'application/json',
+      },
+    })
+
     const result = await model.generateContent(buildPrompt({ creatorName, projectType, projectIdea, targetAudience, language }))
     const rawText = result.response.text().trim()
     const cleaned = rawText
@@ -56,7 +63,8 @@ export default async function handler(req, res) {
       
     res.status(200).json(JSON.parse(cleaned))
   } catch (err) {
-    console.error('Gemini API error:', err.message)
-    res.status(500).json({ error: 'AI generation failed. Please check your GEMINI_API_KEY running in Vercel settings.' })
+    console.error('Gemini API error:', err)
+    res.status(500).json({ error: `AI generation failed: ${err.message}` })
   }
 }
+
