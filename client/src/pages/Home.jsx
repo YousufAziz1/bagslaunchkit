@@ -183,7 +183,7 @@ export default function Home({
   }
 
   return (
-    <div className="min-h-screen bg-mesh relative overflow-x-hidden">
+    <div className="min-h-screen bg-mesh relative overflow-x-clip">
       {/* Background */}
       <div className="bg-dots fixed inset-0 pointer-events-none opacity-40" />
       <div className="orb orb-purple pointer-events-none" />
